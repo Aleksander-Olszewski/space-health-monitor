@@ -6,7 +6,6 @@ from logic import load_events, readings, evaluate_alerts
 
 # Importy z rozdzielonych plików widoków
 from guidebook_view import build_guidebook_screen
-from ice_view import build_ice_screen
 from settings_view import build_settings_screen
 from monitoring_view import build_monitoring_dashboard
 from calendar_view import build_calendar_screen
@@ -28,16 +27,18 @@ def main(page: ft.Page):
     # Główny kontener renderujący widok
     display = ft.AnimatedSwitcher(
         content=txt("Ładowanie panelu...", 14, WHITE), # Tu docelowo: build_monitoring_dashboard()
-        duration=240, reverse_duration=140, transition=ft.AnimatedSwitcherTransition.FADE,
+        duration=240, reverse_duration=140, transition=ft.AnimatedSwitcherTransition.FADE, expand=True,
     )
 
     scroller = ft.Column(expand=True, scroll=ft.ScrollMode.AUTO, controls=[
-        ft.Container(padding=ft.Padding.symmetric(horizontal=15, vertical=10), content=display)
+        ft.Container(padding=ft.Padding.symmetric(horizontal=15, vertical=10), content=display, expand=True,)
     ])
 
     def open_tab(index):
         state["tab"] = index
         navigation.selected_index = index
+
+        scroller.scroll = None if index == 2 else ft.ScrollMode.AUTO 
         
         # Prawdziwa logika podpinania widoków
         if index == 0:
@@ -45,10 +46,8 @@ def main(page: ft.Page):
         elif index == 1:
             display.content = build_calendar_screen(state, page)
         elif index == 2:
-            display.content = build_guidebook_screen()  # Tu nie przekazujemy state/page, bo to prosty widok
+            display.content = build_guidebook_screen()
         elif index == 3:
-            display.content = build_ice_screen(state, page)
-        elif index == 4:
             display.content = build_settings_screen(state, page)
             
         page.update()
@@ -61,17 +60,12 @@ def main(page: ft.Page):
             ft.NavigationBarDestination(icon=ft.Icons.MONITOR_HEART, label="Monitoring"),
             ft.NavigationBarDestination(icon=ft.Icons.CALENDAR_MONTH, label="Kalendarz"),
             ft.NavigationBarDestination(icon=ft.Icons.MENU_BOOK, label="Podręcznik"),
-            ft.NavigationBarDestination(icon=ft.Icons.MEDICAL_SERVICES, label="ICE Asystent"),
             ft.NavigationBarDestination(icon=ft.Icons.SETTINGS, label="Ustawienia"),
         ],
     )
     
     page.navigation_bar = navigation
     page.add(ft.SafeArea(expand=True, content=ft.Column(expand=True, spacing=0, controls=[
-        ft.Container(padding=ft.Padding.only(left=19, right=19, top=14, bottom=5), content=ft.Column(spacing=3, controls=[
-            txt("System monitorowania zdrowia astronauty", 23, WHITE, True),
-        ])),
-        ft.Divider(color=PANEL, height=5),
         scroller,
     ])))
 
