@@ -12,7 +12,7 @@ import flet as ft
 
 # Kolory interfejsu — zwykłe heksy są obsługiwane przez Flet.
 BACKGROUND = "#080D1B"
-PANEL = "#111B30"
+PANEL = "#111B30" 
 PANEL_ALT = "#0D1628"
 STROKE = "#253854"
 TEXT = "#E9F4FF"
